@@ -1,10 +1,10 @@
-import {Form, redirect, useActionData, useNavigation} from "react-router-dom";
-import {createOrder} from "../../services/apiRestaurant.js";
+import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
+import { createOrder } from "../../services/apiRestaurant.js";
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str) =>
   /^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/.test(
-    str
+    str,
   );
 
 const fakeCart = [
@@ -36,8 +36,8 @@ function CreateOrder() {
   const cart = fakeCart;
 
   const navigation = useNavigation();
-  const isSubmitting = navigation.state === 'submitting';
-  const formErrors = useActionData()
+  const isSubmitting = navigation.state === "submitting";
+  const formErrors = useActionData();
 
   return (
     <div>
@@ -77,33 +77,39 @@ function CreateOrder() {
 
         <div>
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
-          <button disabled={isSubmitting}>{isSubmitting ? "Placing order..." : "Order now"}</button>
+          <button
+            className="bg-yellow-400 uppercase font-semibold text-stone-800 py-3 px-3 inline-block tracking-wide rounded-full hover:bg-yellow-300 transition-colors duration-300 focus:outline-none focus:ring focus:ring-yellow-300 focus:bg-yellow-300 focus:ring-offset-2 cursor-not-allowed"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Placing order..." : "Order now"}
+          </button>
         </div>
       </Form>
     </div>
   );
 }
 
-export async function action({request}){
+export async function action({ request }) {
   const formData = await request.formData();
-  const data = Object.fromEntries(formData)
+  const data = Object.fromEntries(formData);
 
   const order = {
     ...data,
     cart: JSON.parse(data.cart),
     priority: data.priority === "on",
-  }
+  };
 
   const errors = {};
 
   if (!isValidPhone(order.phone)) {
     errors.phone = "Please enter a valid phone number";
   }
-  if (Object.keys(errors).length > 0) return errors
+  if (Object.keys(errors).length > 0) return errors;
 
-  const newOrder = await createOrder(order)
-
-  return redirect(`/order/${newOrder.id}`);
+  // const newOrder = await createOrder(order);
+  //
+  // return redirect(`/order/${newOrder.id}`);
+  return null;
 }
 
 export default CreateOrder;
